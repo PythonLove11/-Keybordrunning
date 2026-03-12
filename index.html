@@ -2,63 +2,115 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-
 <title>きいぼおどらんにんぐ</title>
-
-<!-- 検索エンジン向け -->
 <meta name="description" content="きいぼおどらんにんぐのゲーム解説サイト。操作方法やjqentyの説明を紹介しています。">
 <meta name="keywords" content="きいぼおどらんにんぐ, キーボードゲーム, jqenty, ブラウザゲーム">
-<meta name="author" content="YourName">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<!-- ドット風フォント -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
+<style>
 body{
     margin:0;
-    font-family:sans-serif;
+    font-family: 'Press Start 2P', cursive; /* ドット風フォント */
     background:#f4f6fb;
+    scroll-behavior:smooth; /* 滑らかスクロール */
 }
 
-/* 上部固定ヘッダー */
+/* ヘッダー */
 header{
     position:fixed;
     top:0;
     width:100%;
     background:#34495e;
     color:white;
-    text-align:center;
-    padding:10px 0 20px 0;
     z-index:1000;
 }
 
-/* タブ */
+/* ヘッダー内 */
+.header-container{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:60px;
+    position:relative;
+    padding-left:80px; /* タイトルと三本線の間隔 */
+}
+
+/* タイトル */
+header h1{
+    margin:0;
+    font-size:26px;
+}
+
+/* ハンバーガーメニュー */
+.menu-button{
+    position:absolute;
+    left:20px;
+    width:30px;
+    height:24px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.menu-button span{
+    display:block;
+    height:4px;
+    background:white;
+    border-radius:2px;
+    transition:0.3s;
+}
+
+/* アニメーション */
+.menu-button.active span:nth-child(1){
+    transform:rotate(45deg) translate(6px,6px);
+}
+
+.menu-button.active span:nth-child(2){
+    opacity:0;
+}
+
+.menu-button.active span:nth-child(3){
+    transform:rotate(-45deg) translate(6px,-6px);
+}
+
+/* メニュー（左スライド） */
 nav{
-    margin-bottom:10px;
+    position:fixed;
+    top:0;
+    left:-200px; /* 初期は画面外 */
+    width:200px;
+    height:100%;
+    background:#2c3e50;
+    overflow-y:auto;
+    transition:left 0.3s ease;
+    z-index:999;
+}
+
+nav.open{
+    left:0;
 }
 
 nav a{
+    display:block;
+    padding:14px;
+    text-align:center;
     color:white;
     text-decoration:none;
-    margin:0 10px;
-    font-size:14px;
 }
 
 nav a:hover{
-    text-decoration:underline;
-}
-
-/* ロゴ画像 */
-header img{
-    max-width:200px;
-    display:block;
-    margin:10px auto;
+    background:#3b5870;
 }
 
 /* 本文 */
 main{
     max-width:900px;
     margin:auto;
-    padding:220px 30px 30px 30px;
+    padding:100px 30px 30px 30px;
 }
 
 section{
@@ -69,7 +121,7 @@ section{
     box-shadow:0 3px 8px rgba(0,0,0,0.1);
 }
 
-/* コピーライト */
+/* フッター */
 footer{
     background:#2c3e50;
     color:white;
@@ -78,25 +130,41 @@ footer{
     font-size:14px;
 }
 
+/* スマホ対応 */
+@media screen and (max-width:600px){
+    header h1{
+        font-size:22px;
+    }
+    .header-container{
+        padding-left:60px;
+    }
+    nav{
+        width:160px;
+    }
+}
 </style>
 </head>
 
 <body>
 
 <header>
+<div class="header-container">
+    <div class="menu-button" id="menu-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <h1>きいぼおどらんにんぐ</h1>
+</div>
 
-<nav>
-<a href="#about">ゲームとは</a>
-<a href="#controls">操作方法</a>
-<a href="#jqenty">jqenty</a>
+<nav id="menu">
+    <a href="#about" class="menu-link">ゲームとは</a>
+    <a href="#controls" class="menu-link">操作方法</a>
+    <a href="#jqenty" class="menu-link">jqenty</a>
 </nav>
-
-<h1><img src="配置なし.PNG" alt="きいぼおどらんにんぐ ロゴ"></h1>
-
 </header>
 
 <main>
-
 <section id="about">
 <h2>ゲームとは？</h2>
 <p>
@@ -121,12 +189,42 @@ jqentyはJavaScriptを簡単に扱うためのライブラリです。
 イベント処理や画面操作を簡単に実装できます。
 </p>
 </section>
-
 </main>
 
 <footer>
 © 2026 Yuki Ando / きいぼおどらんにんぐ 解説サイト
 </footer>
+
+<script>
+const menuBtn = document.getElementById('menu-btn');
+const menu = document.getElementById('menu');
+const menuLinks = document.querySelectorAll('.menu-link');
+
+// ハンバーガー押したら開閉
+menuBtn.addEventListener('click', (e)=>{
+    e.stopPropagation(); // イベントがbodyに伝播しないようにする
+    menu.classList.toggle('open');
+    menuBtn.classList.toggle('active');
+});
+
+// メニュー項目クリックでスクロール＆閉じる
+menuLinks.forEach(link => {
+    link.addEventListener('click', ()=>{
+        menu.classList.remove('open');
+        menuBtn.classList.remove('active');
+    });
+});
+
+// メニュー開いているとき、タブ以外クリックで閉じる
+document.addEventListener('click', (e)=>{
+    if(menu.classList.contains('open')){
+        if(!menu.contains(e.target) && e.target !== menuBtn){
+            menu.classList.remove('open');
+            menuBtn.classList.remove('active');
+        }
+    }
+});
+</script>
 
 </body>
 </html>
